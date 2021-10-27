@@ -10,6 +10,8 @@ import io from 'socket.io-client';
 
 class App extends Component {
 
+    characteristics = [];
+
     constructor(props) {
         super(props);
         const socket = io();
@@ -91,11 +93,16 @@ class App extends Component {
 //! toioとBLE接続
     async connectToToio(){
         const TOIO_SERVICE_UUID = "10b20100-5b3b-4571-9508-cf3efcd7bbae";
-        const MOTOR__CHARACTERISTIC_UUID = "10b20102-5b3b-4571-9508-cf3efcd7bbae";
+        const MOTOR_CHARACTERISTIC_UUID = "10b20102-5b3b-4571-9508-cf3efcd7bbae";
         
-        await navigator.bluetooth.requestDevice({
+        const device = await navigator.bluetooth.requestDevice({
                 filters: [{ services: [TOIO_SERVICE_UUID] }],
         });
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService(TOIO_SERVICE_UUID);
+        const characteristic = await service.getCharacteristic(MOTOR_CHARACTERISTIC_UUID);
+
+        this.characteristics.push(characteristic)
 
         console.log("connected!")
     }
@@ -103,7 +110,6 @@ class App extends Component {
 
     render() {
         const header =  <Header />;
-        const content = <SelectContent component={this.selComp}  args={this.selArg}/>;
         const sidebar = <SideBar clearLogs={() => this.clearLogs()}
         showBus={()=>this.showBus()}
         showBusTrace={()=>this.showBusTrace()}
@@ -111,8 +117,8 @@ class App extends Component {
         showTrain={()=>this.showTrain()}
         resetView={()=>this.resetView()}
         connectToToio={()=>this.connectToToio()}
-
         />;
+        const content = <SelectContent component={this.selComp}  args={this.selArg}/>;
         return (
             <div>
             {header}

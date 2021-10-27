@@ -85,6 +85,7 @@ class RMarker extends MapLayer<LeafletElement, Props> {
     updateLeafletElement(fromProps: Props, toProps: Props) {
         if (toProps.position !== fromProps.position) {
             this.leafletElement.setLatLng(toProps.position)
+            console.log(toProps)
         }
         if (toProps.icon !== fromProps.icon) {
             this.leafletElement.setIcon(toProps.icon)

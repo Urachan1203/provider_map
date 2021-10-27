@@ -17,6 +17,7 @@ class App extends Component {
         const socket = io();
         this.mstore = new MsgStore();
         this.state = {
+            characteristics: this.characteristics,
             store: this.mstore,
             bus: true,
             busTrace: true,
@@ -31,6 +32,7 @@ class App extends Component {
 //        this.selComp =WorldView;
         this.selComp =LeafletMap;
         this.selArg =  {
+            characteristics: this.state.characteristics,
             store:this.state.store,
             bus: this.state.bus,
             busTrace: this.state.busTrace,
@@ -44,11 +46,12 @@ class App extends Component {
     getEvent(data){
 //        console.log("GetEvent:", data);
         // Parse Message
-
+        console.log(this.state)
         this.mstore.addPosition(data)
         this.setState({
             store:this.mstore
         })
+        console.log(this.state)
     }
 
     resetView() {
@@ -102,7 +105,10 @@ class App extends Component {
         const service = await server.getPrimaryService(TOIO_SERVICE_UUID);
         const characteristic = await service.getCharacteristic(MOTOR_CHARACTERISTIC_UUID);
 
-        this.characteristics.push(characteristic)
+        this.characteristics.push({
+            characteristic: characteristic, 
+            packerID: null
+        })
 
         console.log("connected!")
     }

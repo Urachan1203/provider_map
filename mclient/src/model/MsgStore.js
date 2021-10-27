@@ -22,7 +22,7 @@ export default class MsgStore {
         if( store[ms.id] === undefined) store[ms.id]=[]
         if(store[ms.id].length > 1000) store[ms.id].pop()
         store[ms.id].unshift([ms.lat, ms.lon,ms.angle, ms.speed])
-        // console.log(ms.id)
+        // console.log(store[ms.id])
     }
 
 

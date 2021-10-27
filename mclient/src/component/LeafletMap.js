@@ -56,22 +56,73 @@ export default class LeafletMap extends Component {
         this.setState(nextProps);
     }
 
+    isAssignedKeyInToio(key, characteristics){
+        for(let i = 0; i < characteristics.length; ++i){
+            if(characteristics[packerID] == key){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //todo：空いているtoioを探して、あればcharacteristicsのindexを返却。なければnullを返却。
+    findVacantToio(characteristics){
+
+    }
+
+    //todo：与えられた緯度経度をtoio座標系に変換して返却する
+    convLatLonTOToioCoordinate(pos){
+
+    }
+    
+
 
     render() {
         const position = [34.8594, 137.1720];
         let ms = []
         if( this.props.taxi){
             let vs = this.props.store.getVehicle(0); // Car should be ..0
+            console.log(this.props.characteristics)
 
             Object.keys(vs).forEach(function (key) {
-                ms.push(
-                    <RMarker
-                        position={[vs[key][0][0],vs[key][0][1]]}
-                        icon={midVehicleIcon}
-                        rotationOrigin={(midVehicleIcon.options.iconAnchor[0] + 'px ' + midVehicleIcon.options.iconAnchor[1] + 'px')}
-                        rotationAngle ={[vs[key][0][2]]}
-                    />
-                )
+                console.log(key);
+                // このkeyを持つ清掃車がすでにtoioに割り当てられているかチェック
+                if(this.isAssignedKeyInToio(key, this.props.characteristics)){
+                    //todo：BLEでpositionを飛ばす処理を記述
+                    ms.push(
+                        <RMarker
+                            position={[vs[key][0][0],vs[key][0][1]]}
+                            icon={midVehicleIcon}
+                            rotationOrigin={(midVehicleIcon.options.iconAnchor[0] + 'px ' + midVehicleIcon.options.iconAnchor[1] + 'px')}
+                            rotationAngle ={[vs[key][0][2]]}
+                        />
+                    )
+                }
+                // 割当がまだ かつ toioに空きがあれば割り当てる
+                else if(this.findVacantToio() !== null){
+                    //todo：割り当てを行う、setState、BLEでposition飛ばす
+                    ms.push(
+                        <RMarker
+                            position={[vs[key][0][0],vs[key][0][1]]}
+                            icon={midVehicleIcon}
+                            rotationOrigin={(midVehicleIcon.options.iconAnchor[0] + 'px ' + midVehicleIcon.options.iconAnchor[1] + 'px')}
+                            rotationAngle ={[vs[key][0][2]]}
+                        />
+                    )
+                }
+                // 割当がまだ かつ toioに空きもない
+                else{
+                    // そのまま流すだけ
+                    ms.push(
+                        <RMarker
+                            position={[vs[key][0][0],vs[key][0][1]]}
+                            icon={midVehicleIcon}
+                            rotationOrigin={(midVehicleIcon.options.iconAnchor[0] + 'px ' + midVehicleIcon.options.iconAnchor[1] + 'px')}
+                            rotationAngle ={[vs[key][0][2]]}
+                        />
+                    )
+                }
+                
             });
         }
         if( this.props.bus){

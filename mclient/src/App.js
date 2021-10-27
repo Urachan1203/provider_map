@@ -35,6 +35,8 @@ class App extends Component {
             taxi: this.state.taxi,
             train: this.state.train
         };
+
+        
     }
 
     getEvent(data){
@@ -86,6 +88,18 @@ class App extends Component {
 //        this.interval = setInterval(() => this.addDemo(), 5000);
     }
 
+//! toioとBLE接続
+    async connectToToio(){
+        const TOIO_SERVICE_UUID = "10b20100-5b3b-4571-9508-cf3efcd7bbae";
+        const MOTOR__CHARACTERISTIC_UUID = "10b20102-5b3b-4571-9508-cf3efcd7bbae";
+        
+        await navigator.bluetooth.requestDevice({
+                filters: [{ services: [TOIO_SERVICE_UUID] }],
+        });
+
+        console.log("connected!")
+    }
+
 
     render() {
         const header =  <Header />;
@@ -96,6 +110,7 @@ class App extends Component {
         showTaxi={()=>this.showTaxi()}
         showTrain={()=>this.showTrain()}
         resetView={()=>this.resetView()}
+        connectToToio={()=>this.connectToToio()}
 
         />;
         return (

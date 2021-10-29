@@ -46,12 +46,10 @@ class App extends Component {
     getEvent(data){
 //        console.log("GetEvent:", data);
         // Parse Message
-        console.log(this.state)
-        this.mstore.addPosition(data)
+        this.mstore.addPosition(data);
         this.setState({
             store:this.mstore
-        })
-        console.log(this.state)
+        });
     }
 
     resetView() {

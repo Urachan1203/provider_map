@@ -86,24 +86,18 @@ export default class LeafletMap extends Component {
 
     //todo：与えられた緯度経度をtoio座標系に変換して返却する
     convLatLonTOToioCoordinate(lat, lon){
-        return [parseInt(4906.53*lat-172155.39), parseInt(4537.85*lon-621652.01)];
+        return [parseInt(-11341.1478*lat+398985.4461), parseInt(10947.8571*lon-1499948.53106)];
     }
 
     //todo：toioを指定場所に移動させる
     async moveToio(lat, lon, toioIndex, cp){
         let toioCoordinate = this.convLatLonTOToioCoordinate(lat, lon);
-        // const buffer = new ArrayBuffer(12);
-        // const motorBuf = new DataView(buffer)
-        // motorBuf.setUint8(1, 255)
-        // const motorBuf = new Uint16Array([0x0003, 0x0000, 0x0005, 0x0000, 0x0050, 0x0000, 0x0000, toioCoordinate[0],,toioCoordinate[1],, 0x005a])
-        // const motorBuf = new Uint8Array([0x03, 0x00, 0x05, 0x00, 0x50, 0x00, 0x00, 0x55,,0x55,, 0x005a,]);
-        // const motorBuf = new Uint8Array([0x02, 0x01, 0x01, 0x32, 0x02, 0x02, 0x32, 0x78,])
         const buffer = Buffer.alloc(13)
         buffer.writeUInt8(3, 0)
         buffer.writeUInt8(0, 1)
         buffer.writeUInt8(5, 2)
         buffer.writeUInt8(2, 3)
-        buffer.writeUInt8(10, 4)
+        buffer.writeUInt8(60, 4)
         buffer.writeUInt8(0, 5)
         buffer.writeUInt8(0, 6)
         buffer.writeUInt16LE(toioCoordinate[0],7)
@@ -114,12 +108,14 @@ export default class LeafletMap extends Component {
         // const motorBuf = new Uint8Array([0x03, 0x00, 0x05, 0x00, 0x50, 0x00, 0x00, 0x55,,0x55,, 0x005a,]);
         await cp.props.characteristics[toioIndex].characteristic.writeValue(Buffer.from(buffer));
     }
-    
 
 
     render() {
         const position = [34.8594, 137.1720];
         let ms = []
+
+        const bounds = [[35.177343, 137.011519], [35.098515, 137.095097]]
+
         if( this.props.taxi){
             let toioIndex = 0;
             let vs = this.props.store.getVehicle(0); // Car should be ..0
@@ -225,7 +221,7 @@ export default class LeafletMap extends Component {
 //              url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
 
         const map = (
-            <Map center={position} zoom={13}>
+            <Map center={position} zoom={13} bounds={bounds}>
                 <TileLayer
                     url = "https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"
                     attribution ="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"

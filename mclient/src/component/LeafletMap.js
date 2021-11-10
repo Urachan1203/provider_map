@@ -40,10 +40,12 @@ export default class LeafletMap extends Component {
         this.vehicleIcon = midVehicleIcon;
         this.busIcon = midBusIcon;
         this.trainIcon = midTrainIcon;
+        this.mapRef = React.createRef()
     }
 
 
     componentDidMount() {
+        console.log(this.mapRef) 
         // this.interval = setInterval(() => this.addDemo(), 1000);
     }
 
@@ -104,8 +106,6 @@ export default class LeafletMap extends Component {
         buffer.writeUInt16LE(toioCoordinate[1],9)
         buffer.writeUInt16LE(90,11)
 
-        
-        // const motorBuf = new Uint8Array([0x03, 0x00, 0x05, 0x00, 0x50, 0x00, 0x00, 0x55,,0x55,, 0x005a,]);
         await cp.props.characteristics[toioIndex].characteristic.writeValue(Buffer.from(buffer));
     }
 
@@ -116,12 +116,12 @@ export default class LeafletMap extends Component {
 
         const bounds = [[35.177343, 137.011519], [35.098515, 137.095097]]
 
-        if( this.props.taxi){
+        if(this.props.taxi){
             let toioIndex = 0;
             let vs = this.props.store.getVehicle(0); // Car should be ..0
             let cs = this.props.characteristics
             let cp = this
-            console.log(this)
+            // console.log(this)
             Object.keys(vs).forEach(function (key) {
 
                 // このkeyを持つ清掃車がすでにtoioに割り当てられているかチェック
@@ -145,27 +145,6 @@ export default class LeafletMap extends Component {
                     cp.props.characteristics[toioIndex].packerID = key;
                     console.log(cp.props.characteristics[toioIndex].packerID);
                     console.log("toio is assigned")
-                    // ms.push(
-                    //     <RMarker
-                    //         position={[vs[key][0][0],vs[key][0][1]]}
-                    //         icon={midVehicleIcon}
-                    //         rotationOrigin={(midVehicleIcon.options.iconAnchor[0] + 'px ' + midVehicleIcon.options.iconAnchor[1] + 'px')}
-                    //         rotationAngle ={[vs[key][0][2]]}
-                    //     />
-                    // );
-                }
-                // 割当がまだ かつ toioに空きもない
-                else{
-                    // console.log("Cannot assign toio due to the lack of toio module.")
-                    // そのまま流すだけ
-                    // ms.push(
-                    //     <RMarker
-                    //         position={[vs[key][0][0],vs[key][0][1]]}
-                    //         icon={midVehicleIcon}
-                    //         rotationOrigin={(midVehicleIcon.options.iconAnchor[0] + 'px ' + midVehicleIcon.options.iconAnchor[1] + 'px')}
-                    //         rotationAngle ={[vs[key][0][2]]}
-                    //     />
-                    // )
                 }
             });
         }
@@ -217,11 +196,9 @@ export default class LeafletMap extends Component {
         if(ms.length > 0){
             markers = ms;
         }
-
-//              url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-
+        
         const map = (
-            <Map center={position} zoom={13} bounds={bounds}>
+            <Map center={position} zoom={13} bounds={bounds} ref={this.mapRef}>
                 <TileLayer
                     url = "https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"
                     attribution ="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
@@ -230,7 +207,7 @@ export default class LeafletMap extends Component {
             </Map>
         )
 
-//        console.log("zoom:"+map.status.zoom);
+        console.log(this.mapRef) // =>null
 
         return (
             <section className="content">

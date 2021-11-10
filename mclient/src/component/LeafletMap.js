@@ -92,15 +92,8 @@ export default class LeafletMap extends Component {
         return [parseInt(-11341.1478*lat+398985.4461), parseInt(10947.8571*lon-1499948.53106)];
     }
 
-    //todo : 緯度経度座標系とtoio座標系の相似比を計算し、返却する(namiki手法)
-    convHomotheticRatio(lat1,lat2,lon1,lon2){
-        var kx = (949 - 34) / (lat2 - lat1);
-        var ky = (898 - 35) / (lon1 - lon2);
-        return [kx,ky];
-    }
-
         //todo : 緯度経度座標系とtoio座標系の相似比を計算し、返却する(namiki手法)
-        convHomotheticRatio2(NorthWest,SouthEast){
+        convHomotheticRatio(NorthWest,SouthEast){
             var lon1 = NorthWest.lng;
             var lat1 = NorthWest.lat;
             var lon2 = SouthEast.lng;
@@ -110,18 +103,41 @@ export default class LeafletMap extends Component {
             return [kx,ky];
         }
 
-    // //todo : mapのcenterを返す(namiki手法)
-    // convMapCenter(lat1,lat2,lon1,lon2){
-    //     var center_lat = (lat2 + lat1)/2 ;
-    //     var center_lon = (lon1 + lon2)/ 2;
-    //     return [center_lat,center_lon];
-    // }
 
     //todo : ダイナミックな拡大率に合わせて、toioの座標系に変換して返却する(namiki手法)
     convLatLonTOToioCoordinateDynamic(toio_lat, toio_lon,k_list,center_lat,center_lon){
         var toio_x = 492 + k_list[0] * (toio_lat - center_lat);
         var toio_y = 466.5 - k_list[1] * (toio_lon - center_lon);
-        // return [parseInt(toio_x), parseInt(toio_y)];
+        const waitingBuffer = 15;
+        const additionalWaitingBuffer = 5;
+        const cornerWaitingBuffer = waitingBuffer + additionalWaitingBuffer;
+        if (toio_x < 35 + waitingBuffer){
+            if (toio_y < 34 + waitingBuffer || toio_y > 949 - waitingBuffer){
+                toio_x = 35 + cornerWaitingBuffer;
+            }else {
+                toio_x = 35 + waitingBuffer;//waiting position
+            }
+        }else if(toio_x > 898 - waitingBuffer){
+            if (toio_y < 34 + waitingBuffer || toio_y > 949 - waitingBuffer){
+                toio_x = 898 - cornerWaitingBuffer;
+            }else {
+                toio_x = 898 - waitingBuffer;//waiting position
+            }
+        }
+        if (toio_y < 34 + waitingBuffer){
+            if (toio_x < 35 + waitingBuffer || toio_x > 898 - waitingBuffer){
+                toio_y = 34 + cornerWaitingBuffer;
+            }else{
+                toio_y = 34 + waitingBuffer;//waiting position
+            }
+        }else if(toio_y > 949 - waitingBuffer){
+            if (toio_x < 35 + waitingBuffer || toio_x > 898 - waitingBuffer){
+                toio_y = 949 - cornerWaitingBuffer;
+            }else{
+                toio_y = 949 - waitingBuffer;//waiting position
+            }
+        }
+        // return [parseInt(toio_x), parseInt(toio_y)];//?????
         return [parseInt(toio_y), parseInt(toio_x)];
 
     }
@@ -129,16 +145,10 @@ export default class LeafletMap extends Component {
 
     //todo：toioを指定場所に移動させる
     async moveToio(lat, lon, toioIndex, cp){
-        // let toioCoordinate = this.convLatLonTOToioCoordinate(lat, lon);
         var center = this.mapRef.current.leafletElement.getCenter();
-        // var center = this.mapRef.leafletElement.options.center;
-        // var CenterList = this.convMapCenter(Bounds.getWest(),Bounds.getEast(),Bounds.getNorth(),Bounds.getSouth())
         var Bounds = this.mapRef.current.leafletElement.getBounds();
-        // var Bounds = this.mapRef.leafletElement.options.bounds;
-        // let k_list = this.convHomotheticRatio(Bounds.getWest(),Bounds.getEast(),Bounds.getNorth(),Bounds.getSouth());
-        let k_list = this.convHomotheticRatio2(Bounds.getNorthWest(),Bounds.getSouthEast());
+        let k_list = this.convHomotheticRatio(Bounds.getNorthWest(),Bounds.getSouthEast());
         let toioCoordinate = this.convLatLonTOToioCoordinateDynamic(lat,lon,k_list,center.lat,center.lng);
-        // let toioCoordinate = this.convLatLonTOToioCoordinateDynamic(lat,lon,k_list,CenterList[0],CenterList[1]);
         const buffer = Buffer.alloc(13)
         buffer.writeUInt8(3, 0)
         buffer.writeUInt8(0, 1)

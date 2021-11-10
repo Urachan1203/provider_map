@@ -99,18 +99,31 @@ export default class LeafletMap extends Component {
         return [kx,ky];
     }
 
-    //todo : mapのcenterを返す(namiki手法)
-    convMapCenter(lat1,lat2,lon1,lon2){
-        var center_lat = (lat2 + lat1)/2 ;
-        var center_lon = (lon1 + lon2)/ 2;
-        return [center_lat,center_lon];
-    }
+        //todo : 緯度経度座標系とtoio座標系の相似比を計算し、返却する(namiki手法)
+        convHomotheticRatio2(NorthWest,SouthEast){
+            var lon1 = NorthWest.lng;
+            var lat1 = NorthWest.lat;
+            var lon2 = SouthEast.lng;
+            var lat2 = SouthEast.lat;
+            var kx = (949 - 34) / (lat2 - lat1);
+            var ky = (898 - 35) / (lon1 - lon2);
+            return [kx,ky];
+        }
+
+    // //todo : mapのcenterを返す(namiki手法)
+    // convMapCenter(lat1,lat2,lon1,lon2){
+    //     var center_lat = (lat2 + lat1)/2 ;
+    //     var center_lon = (lon1 + lon2)/ 2;
+    //     return [center_lat,center_lon];
+    // }
 
     //todo : ダイナミックな拡大率に合わせて、toioの座標系に変換して返却する(namiki手法)
     convLatLonTOToioCoordinateDynamic(toio_lat, toio_lon,k_list,center_lat,center_lon){
         var toio_x = 492 + k_list[0] * (toio_lat - center_lat);
         var toio_y = 466.5 - k_list[1] * (toio_lon - center_lon);
-        return [parseInt(toio_x), parseInt(toio_y)];
+        // return [parseInt(toio_x), parseInt(toio_y)];
+        return [parseInt(toio_y), parseInt(toio_x)];
+
     }
 
 
@@ -122,7 +135,8 @@ export default class LeafletMap extends Component {
         // var CenterList = this.convMapCenter(Bounds.getWest(),Bounds.getEast(),Bounds.getNorth(),Bounds.getSouth())
         var Bounds = this.mapRef.current.leafletElement.getBounds();
         // var Bounds = this.mapRef.leafletElement.options.bounds;
-        let k_list = this.convHomotheticRatio(Bounds.getWest(),Bounds.getEast(),Bounds.getNorth(),Bounds.getSouth());
+        // let k_list = this.convHomotheticRatio(Bounds.getWest(),Bounds.getEast(),Bounds.getNorth(),Bounds.getSouth());
+        let k_list = this.convHomotheticRatio2(Bounds.getNorthWest(),Bounds.getSouthEast());
         let toioCoordinate = this.convLatLonTOToioCoordinateDynamic(lat,lon,k_list,center.lat,center.lng);
         // let toioCoordinate = this.convLatLonTOToioCoordinateDynamic(lat,lon,k_list,CenterList[0],CenterList[1]);
         const buffer = Buffer.alloc(13)

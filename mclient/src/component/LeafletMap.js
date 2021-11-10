@@ -86,7 +86,7 @@ export default class LeafletMap extends Component {
 
     //todo：与えられた緯度経度をtoio座標系に変換して返却する
     convLatLonTOToioCoordinate(lat, lon){
-        return [parseInt(4906.53*lat-172155.39), parseInt(4537.85*lon-621652.01)];
+        return [parseInt(-11341.1478*lat+398985.4461), parseInt(10947.8571*lon-1499948.53106)];
     }
 
     //todo：toioを指定場所に移動させる
